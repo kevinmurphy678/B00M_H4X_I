@@ -29,14 +29,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -71,12 +71,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -88,10 +92,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;B00M_H4X_I_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\kevin\Documents\Visual Studio 2015\Projects\B00M_H4X_I\B00M_H4X_I;C:\Program Files (x86)\dxSDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\dxSDK\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,12 +123,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;B00M_H4X_I_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\dxSDK\Include;C:\Users\kevin\Documents\Visual Studio 2015\Projects\B00M_H4X_I\B00M_H4X_I;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\dxSDK\Include;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,6 +152,86 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DrawManager.cpp" />
+    <ClCompile Include="Hookers.cpp" />
+    <ClCompile Include="ImGUI\DX9\imgui_impl_dx9.cpp" />
+    <ClCompile Include="ImGUI\imgui.cpp" />
+    <ClCompile Include="ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="NetVarManager.cpp" />
+    <ClCompile Include="SourceEngine\Convar.cpp" />
+    <ClCompile Include="SourceEngine\CRC.cpp" />
+    <ClCompile Include="SourceEngine\SDK.cpp" />
+    <ClCompile Include="SourceEngine\UtlString.cpp" />
+    <ClCompile Include="SourceEngine\Vector.cpp" />
+    <ClCompile Include="SourceEngine\Vector2D.cpp" />
+    <ClCompile Include="SourceEngine\Vector4D.cpp" />
+    <ClCompile Include="SourceEngine\VMatrix.cpp" />
+    <ClCompile Include="VTFHook.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Aimbot.hpp" />
+    <ClInclude Include="CSGOStructs.hpp" />
+    <ClInclude Include="Draw.hpp" />
+    <ClInclude Include="DrawManager.hpp" />
+    <ClInclude Include="Esp.hpp" />
+    <ClInclude Include="Hookers.h" />
+    <ClInclude Include="IInputSystem.hpp" />
+    <ClInclude Include="ImGUI\DX9\imgui_impl_dx9.h" />
+    <ClInclude Include="ImGUI\imconfig.h" />
+    <ClInclude Include="ImGUI\imgui.h" />
+    <ClInclude Include="ImGUI\imgui_internal.h" />
+    <ClInclude Include="ImGUI\stb_rect_pack.h" />
+    <ClInclude Include="ImGUI\stb_textedit.h" />
+    <ClInclude Include="ImGUI\stb_truetype.h" />
+    <ClInclude Include="InterfaceManager.h" />
+    <ClInclude Include="Math.hpp" />
+    <ClInclude Include="Misc.hpp" />
+    <ClInclude Include="NetVarManager.hpp" />
+    <ClInclude Include="SourceEngine\CGlobalVarsBase.hpp" />
+    <ClInclude Include="SourceEngine\CHandle.hpp" />
+    <ClInclude Include="SourceEngine\CInput.hpp" />
+    <ClInclude Include="SourceEngine\ClientClass.hpp" />
+    <ClInclude Include="SourceEngine\Color.hpp" />
+    <ClInclude Include="SourceEngine\Convar.hpp" />
+    <ClInclude Include="SourceEngine\CRC.hpp" />
+    <ClInclude Include="SourceEngine\Definitions.hpp" />
+    <ClInclude Include="SourceEngine\IAppSystem.hpp" />
+    <ClInclude Include="SourceEngine\IBaseClientDll.hpp" />
+    <ClInclude Include="SourceEngine\IClientEntity.hpp" />
+    <ClInclude Include="SourceEngine\IClientEntityList.hpp" />
+    <ClInclude Include="SourceEngine\IClientMode.hpp" />
+    <ClInclude Include="SourceEngine\IClientNetworkable.hpp" />
+    <ClInclude Include="SourceEngine\IClientRenderable.hpp" />
+    <ClInclude Include="SourceEngine\IClientThinkable.hpp" />
+    <ClInclude Include="SourceEngine\IClientUnknown.hpp" />
+    <ClInclude Include="SourceEngine\IConVar.hpp" />
+    <ClInclude Include="SourceEngine\ICvar.hpp" />
+    <ClInclude Include="SourceEngine\IEngineTrace.hpp" />
+    <ClInclude Include="SourceEngine\IHandleEntity.hpp" />
+    <ClInclude Include="SourceEngine\IMaterial.hpp" />
+    <ClInclude Include="SourceEngine\IMaterialSystem.hpp" />
+    <ClInclude Include="SourceEngine\IPanel.hpp" />
+    <ClInclude Include="SourceEngine\ISurface.hpp" />
+    <ClInclude Include="SourceEngine\IVEngineClient.hpp" />
+    <ClInclude Include="SourceEngine\IVModelInfo.hpp" />
+    <ClInclude Include="SourceEngine\IVModelRender.hpp" />
+    <ClInclude Include="SourceEngine\KeyValues.hpp" />
+    <ClInclude Include="SourceEngine\PlayerInfo.hpp" />
+    <ClInclude Include="SourceEngine\QAngle.hpp" />
+    <ClInclude Include="SourceEngine\Recv.hpp" />
+    <ClInclude Include="SourceEngine\SDK.hpp" />
+    <ClInclude Include="SourceEngine\UtlMemory.hpp" />
+    <ClInclude Include="SourceEngine\UtlString.hpp" />
+    <ClInclude Include="SourceEngine\UtlVector.hpp" />
+    <ClInclude Include="SourceEngine\Vector.hpp" />
+    <ClInclude Include="SourceEngine\Vector2D.hpp" />
+    <ClInclude Include="SourceEngine\Vector4D.hpp" />
+    <ClInclude Include="SourceEngine\VMatrix.hpp" />
+    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="VFTableHook.hpp" />
+    <ClInclude Include="VTFHook.h" />
+    <ClInclude Include="XorStr.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
