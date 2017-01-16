@@ -7,7 +7,7 @@
 #include <Utils.hpp>
 #include <Windows.h>
 #include <math.h>
-
+#include <DrawManager.hpp>
 #include <d3d9.h>
 #include <d3dx9.h>
 
@@ -21,6 +21,14 @@ extern LRESULT ImGui_ImplDX9_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, 
 
 namespace SourceEngine
 {
+
+	static std::unique_ptr<VFTableHook>	   g_frameStageNotify = nullptr;
+	static std::unique_ptr<VFTableHook>       g_pClientModeHook = nullptr;
+	static std::unique_ptr<VFTableHook>	   g_pPaintTraverseHook = nullptr;
+	static std::unique_ptr<VFTableHook>       g_pD3DDevice9Hook = nullptr;
+	static std::unique_ptr<VFTableHook>       g_RenderViewHook = nullptr;
+	static std::unique_ptr<VFTableHook>       g_ModelRendererHook = nullptr;
+	static std::unique_ptr<DrawManager>       g_pRenderer = nullptr;
 
 	using InitKeyValuesFn = void(__thiscall*)(void* thisptr, const char* name);
 	using LoadFromBufferFn = void(__thiscall*)(void* thisptr, const char* resourceName, const char* pBuffer, void* pFileSystem, const char* pPathID, void* pfnEvaluateSymbolProc);

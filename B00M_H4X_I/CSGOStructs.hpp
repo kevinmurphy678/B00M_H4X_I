@@ -51,6 +51,20 @@ namespace SourceEngine {
 			typedef const char* (__thiscall* tGetName)(void*);
 			return SourceEngine::CallVFunction<tGetName>(this, 378)(this);
 		}
+
+		bool SetupBones(matrix3x4_t* pBoneMatrix, int nMaxBones, int nBoneMask, float flCurTime = 0)
+		{
+			typedef bool(__thiscall *oSetupBones)(void*, matrix3x4_t*, int, int, float);
+			return SourceEngine::CallVFunction<oSetupBones>(this, 13)(this, pBoneMatrix, nMaxBones, nBoneMask, flCurTime);
+		}
+
+		model_t* GetModel()
+		{
+			typedef model_t* (*oGetModel)(void*);
+			return SourceEngine::CallVFunction<oGetModel>(this, 8)(this);
+		}
+
+
 		int GetItemDefinitionIndex()
 		{
 			static int m_iItemDefinitionIndex = GET_NETVAR(XorStr("DT_BaseAttributableItem"), XorStr("m_AttributeManager"), XorStr("m_Item"), XorStr("m_iItemDefinitionIndex"));

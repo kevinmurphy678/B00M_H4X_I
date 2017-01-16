@@ -263,5 +263,8 @@
     <ClInclude Include="SourceEngine\IMaterial.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Chams.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

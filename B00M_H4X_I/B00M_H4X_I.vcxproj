@@ -171,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aimbot.hpp" />
+    <ClInclude Include="Chams.hpp" />
     <ClInclude Include="CSGOStructs.hpp" />
     <ClInclude Include="Draw.hpp" />
     <ClInclude Include="DrawManager.hpp" />

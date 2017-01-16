@@ -3,7 +3,7 @@
 #include<Esp.hpp>
 #include<Aimbot.hpp>
 #include<Misc.hpp>
-
+#include<Chams.hpp>
 #include <DrawManager.hpp>
 #include "ImGUI/imgui.h"
 #include "ImGUI/DX9/imgui_impl_dx9.h"
@@ -14,13 +14,7 @@ namespace SourceEngine
 	bool running = true;
 	DWORD clientBase;
 
-	std::unique_ptr<VFTableHook>	   g_frameStageNotify = nullptr;
-	std::unique_ptr<VFTableHook>       g_pClientModeHook = nullptr;
-	std::unique_ptr<VFTableHook>	   g_pPaintTraverseHook = nullptr;
-	std::unique_ptr<VFTableHook>       g_pD3DDevice9Hook = nullptr;
-	std::unique_ptr<VFTableHook>       g_RenderViewHook = nullptr;
-	std::unique_ptr<VFTableHook>       g_ModelRendererHook = nullptr;
-	std::unique_ptr<DrawManager>       g_pRenderer = nullptr;
+
 	
 
 	CreateMove_t                       CreateMove_Original = nullptr;
@@ -44,11 +38,6 @@ namespace SourceEngine
 	WNDPROC                            g_pOldWindowProc = nullptr; //Old WNDPROC pointer
 	bool                               vecPressedKeys[256] = {};
 
-	IMaterial* materialChams;
-	IMaterial* materialChamsIgnorez;
-	IMaterial* materialChamsFlat;
-	IMaterial* materialChamsFlatIgnorez;
-	IMaterial* materialChamsArms;
 
 	inline uintptr_t GetAbsoluteAddress(uintptr_t instruction_ptr, int offset, int size)
 	{
@@ -141,30 +130,6 @@ namespace SourceEngine
 	
 	}
 
-	#define RandomInt(nMin, nMax) (rand() % (nMax - nMin + 1) + nMin)
-
-	static int created = 0;
-	static IMaterial* CreateMaterial(std::string type, std::string texture, bool ignorez, bool nofog, bool model, bool nocull, bool halflambert)
-	{
-		std::stringstream materialData;
-		materialData << "\"" + type + "\"\n"
-			"{\n"
-			"\t\"$basetexture\" \"" + texture + "\"\n"
-			"\t\"$ignorez\" \"" + std::to_string(ignorez) + "\"\n"
-			"\t\"$nofog\" \"" + std::to_string(nofog) + "\"\n"
-			"\t\"$model\" \"" + std::to_string(model) + "\"\n"
-			"\t\"$nocull\" \"" + std::to_string(nocull) + "\"\n"
-			"\t\"$halflambert\" \"" + std::to_string(halflambert) + "\"\n"
-			"}\n" << std::flush;
-
-		std::string materialName = "aimtux_" + std::to_string(RandomInt(10, 100000));
-		KeyValues* keyValues = new KeyValues(materialName.c_str());
-
-		InitKeyValues(keyValues, type.c_str());
-		LoadFromBuffer(keyValues, materialName.c_str(), materialData.str().c_str(), nullptr, NULL, nullptr);
-
-		return Material->CreateMaterial(materialName.c_str(), keyValues);
-	}
 
 	void InitKeyValues(KeyValues* pKeyValues, const char* name)
 	{
@@ -249,64 +214,7 @@ namespace SourceEngine
 		matrix3x4_t *pCustomBoneToWorld)
 	{
 
-		static bool created = false;
-		if (!created)
-		{
-			materialChams = CreateMaterial("VertexLitGeneric", "VGUI/white_additive", false, true, true, true, true);
-			materialChamsIgnorez = CreateMaterial("VertexLitGeneric", "VGUI/white_additive", true, true, true, true, true);
-			materialChamsFlat = CreateMaterial("UnlitGeneric", "VGUI/white_additive", false, true, true, true, true);
-			materialChamsFlatIgnorez = CreateMaterial("UnlitGeneric", "VGUI/white_additive", true, true, true, true, true);
-			materialChamsArms = CreateMaterial("VertexLitGeneric", "VGUI/white_additive", false, true, true, true, true);
-			created = true;
-		}
-
-		if (pInfo.pModel)
-		{
-			std::string modelName = ModelInfo->GetModelName(pInfo.pModel);
-
-
-			if (modelName.find("arms") != std::string::npos)
-			{
-				IMaterial *mat = materialChams;
-				mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, true);
-				mat->ColorModulate(1, 0, 0);
-				ModelRender->ForcedMaterialOverride(mat);
-			}
-			else if (modelName.find("models/player") != std::string::npos)
-			{
-				IMaterial *visible_material;
-				IMaterial *hidden_material;
-				visible_material = materialChamsFlat;
-				hidden_material = materialChamsFlatIgnorez;
-				C_CSPlayer* player = static_cast<C_CSPlayer*>(EntitiyList->GetClientEntity(pInfo.entity_index));
-				auto pLocal = C_CSPlayer::GetLocalPlayer();
-
-				if (pLocal && player)
-				{
-					if (player != pLocal)
-					{
-
-						if (player->GetTeamNum() == pLocal->GetTeamNum())
-						{
-							visible_material->ColorModulate(0.0f, 0.0f, 1.f);
-							hidden_material->ColorModulate(0.25f, 0.25f, 0.5f);
-						}
-						else
-						{
-							visible_material->ColorModulate(1.f, 0.0f, 0.5f);
-							hidden_material->ColorModulate(0.5f, 0.25f, 0.25f);
-						}
-
-						ModelRender->ForcedMaterialOverride(visible_material);
-					}
-				}
-				//DrawModelExecute_Original(ModelRender, ctx, state, pInfo, pCustomBoneToWorld);
-
-				//ModelRender->ForcedMaterialOverride(visible_material);
-				//DrawModelExecute_Original(ModelRender, ctx, state, pInfo, pCustomBoneToWorld);
-			}
-
-		}
+		Chams_DrawModelExecute(ctx, state, pInfo, pCustomBoneToWorld);
 
 		DrawModelExecute_Original(ModelRender, ctx, state, pInfo, pCustomBoneToWorld);
 		ModelRender->ForcedMaterialOverride(NULL);
@@ -470,7 +378,7 @@ namespace SourceEngine
 					{
 						ImGui::Checkbox(XorStr("Aimbot Enabled"), &aimbotE);
 						ImGui::Checkbox(XorStr("Auto Shoot"), &aimbotAutoShoot);
-						ImGui::SliderFloat("Aimbot FOV", &aimbotFov, 1, 100, "%.0f");						
+						ImGui::SliderFloat("Aimbot FOV", &aimbotFov, 1, 100, "%.0f");
 					}
 					if (ImGui::CollapsingHeader("Bunny Hop"))
 					{
@@ -478,17 +386,40 @@ namespace SourceEngine
 					}
 					if (ImGui::CollapsingHeader("ESP"))
 					{
-						ImGui::Checkbox(XorStr("ESP Enabled"), &espE);					
+						ImGui::Checkbox(XorStr("ESP Enabled"), &espE);
 						ImGui::Checkbox(XorStr("Line of sight"), &esp_LOS);
-						if (ImGui::CollapsingHeader("CT Color"))
+						ImGui::Checkbox(XorStr("Skeleton"), &espSkeleton);
+						ImGui::Text("Ally Color");
+						ColorPicker3(esp_CT_Color);
+						ImGui::Text("Enemy Color");
+						ColorPicker3(esp_T_Color);
+						
+					}
+					if (ImGui::CollapsingHeader("Chams"))
+					{
+						ImGui::Checkbox(XorStr("Chams Enabled"), &chamsE);
+						ImGui::Checkbox(XorStr("Wireframe Hands"), &chamsWireFrameHands);
+						ImGui::Checkbox(XorStr("No Hands"), &chamsNoHands);
+						ImGui::Text("Hands Color (Wireframe only)");
+						ColorPicker3(chamsHands);
+					/*	if (ImGui::CollapsingHeader("Ally Color"))
 						{
-							ColorPicker3(esp_CT_Color);
+							ImGui::Text("Visible Color Ally");
+							ColorPicker3(chamsAllyColor_Visible);
+							ImGui::Text("Hidden Color Ally");
+							ColorPicker3(chamsAllyColor);
+							
 						}
-						if (ImGui::CollapsingHeader("T Color"))
+
+						if (ImGui::CollapsingHeader("Enemy Color"))
 						{
-							ColorPicker3(esp_T_Color);
-						}
-					}	
+							ImGui::Text("Visible Color Enemy");
+							ColorPicker3(chamsEnemyColor_Visible);
+							ImGui::Text("Hidden Color Enemy");
+							ColorPicker3(chamsEnemyColor);			
+						}*/
+
+					}
 					if (ImGui::CollapsingHeader("Misc"))
 					{
 						ImGui::SliderFloat("Flash Intensity", &misc_NoFlash, 0, 255, "%.0f");
@@ -502,7 +433,6 @@ namespace SourceEngine
 				g_pRenderer->EndRendering();
 			}
 		}
-
 		return g_fnOriginalEndScene(pDevice);
 	}
 

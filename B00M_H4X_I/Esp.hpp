@@ -1,11 +1,13 @@
 #pragma once
-
+#include<Chams.hpp>
 namespace SourceEngine
 {
 	bool espE = false;
 	bool esp_LOS = false;
-	float esp_CT_Color[] = { 55, 55, 255 };
-	float esp_T_Color[] = { 255, 55, 55 };
+	bool espSkeleton = false;
+
+	float esp_CT_Color[] = { 55 / 255.f, 55 / 255.f, 255 / 255.f };
+	float esp_T_Color[] = { 255 / 255.f, 255 / 255.f, 55 / 255.f };
 
 	void DrawESP()
 	{
@@ -36,7 +38,7 @@ namespace SourceEngine
 					float w = h * 0.66f;
 					Color hitBox;
 
-					if (player->GetTeamNum() == 2)
+					if (player->GetTeamNum() == localPlayer->GetTeamNum())
 						hitBox = Color(esp_T_Color[0] * 255, esp_T_Color[1] * 255, esp_T_Color[2] * 255);
 					else
 						hitBox = Color(esp_CT_Color[0] * 255, esp_CT_Color[1] * 255, esp_CT_Color[2] * 255);
@@ -73,13 +75,44 @@ namespace SourceEngine
 
 						EngineTrace->TraceRay(ray, MASK_SHOT, &filter, &tr);
 
-						if (!Utils::WorldToScreen(src3D, src) || !Utils::WorldToScreen(tr.endpos, dst))
+						if (Utils::WorldToScreen(src3D, src) && Utils::WorldToScreen(tr.endpos, dst))
+						{
+							DrawLine(src.x, src.y, dst.x, dst.y, Color(255, 255, 255, 155));
+							DrawRect(dst.x - 3, dst.y - 3, 6, 6, Color(255, 255, 255, 200));
+						}
+
+					
+					}
+					if (espSkeleton)
+					{
+						const studiohdr_t* pStudioModel = ModelInfo->FindModel(player->GetModel());
+						if (!pStudioModel)
 							return;
 
-						DrawLine(src.x, src.y, dst.x, dst.y, Color(255, 255, 255, 155));
-						DrawRect(dst.x - 3, dst.y - 3, 6, 6, Color(255, 255, 255, 200));
+						static matrix3x4_t pBoneToWorldOut[128];
+						if (player->SetupBones(pBoneToWorldOut, 128, 256, 0))
+						{
+							for (int i = 0; i < pStudioModel->numbones; i++)
+							{
+								mstudiobone_t* pBone = pStudioModel->pBone(i);
+								if (!pBone || !(pBone->flags & 256) || pBone->parent == -1)
+									continue;
+
+								Vector vBonePos1;
+								if (!Utils::WorldToScreen(Vector(pBoneToWorldOut[i][0][3], pBoneToWorldOut[i][1][3], pBoneToWorldOut[i][2][3]), vBonePos1))
+									continue;
+
+								Vector vBonePos2;
+								if (!Utils::WorldToScreen(Vector(pBoneToWorldOut[pBone->parent][0][3], pBoneToWorldOut[pBone->parent][1][3], pBoneToWorldOut[pBone->parent][2][3]), vBonePos2))
+									continue;
+
+
+								DrawLine(vBonePos1.x, vBonePos1.y, vBonePos2.x, vBonePos2.y, chamsE ? Color(0,0,0) : Color(255,255,255));
+							}
+						}
 
 					}
+			
 					
 				}
 
